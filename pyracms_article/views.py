@@ -10,6 +10,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import has_permission
 from pyramid.url import route_url
 from pyramid.view import view_config
+from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
 
 u = UserLib()
 s = SettingsLib()
@@ -193,3 +194,25 @@ def article_add_vote(context, request):
         request.session.flash(s.show_setting("ERROR_VOTE"), ERROR)
     return redirect(request, "article_read", page_id=vote_id)
 
+@view_config(route_name='userarea_admin_backup_articles', permission='backup')
+def userarea_admin_backup_articles(context, request):
+    a = ArticleLib()
+    res = request.response
+    res.content_type = "application/json"
+    res.text = str(a.to_json())
+    return res
+
+@view_config(route_name='userarea_admin_restore_articles', permission='backup',
+             renderer='deform.jinja2')
+def userarea_admin_restore_articles(context, request):
+    def restore_backup_submit(context, request, deserialized, bind_params):
+        a = ArticleLib()
+        a.from_json(request, deserialized['restore_backup_json_file']
+                    ['fp'].read().decode())
+        return redirect(request, "article_list")
+    result = rapid_deform(context, request, RestoreBackupSchema,
+                          restore_backup_submit)
+    if isinstance(result, dict):
+        message = "Restore Articles from JSON File"
+        result.update({"title": message, "header": message})
+    return result
