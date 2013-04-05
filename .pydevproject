@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse-pydev version="1.0"?><pydev_project>
+<pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
+<path>/pyracms_article</path>
+</pydev_pathproperty>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 3.0</pydev_property>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">python3-linux</pydev_property>
+<pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
+<path>/home/r/Dropbox/Aptana Studio 3 Workspace/pyracms</path>
+</pydev_pathproperty>
+</pydev_project>
