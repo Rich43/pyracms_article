@@ -1,3 +1,4 @@
+from .views import article_read
 def includeme(config):
     """ Activate the forum; usually called via
     ``config.include('pyracms_forum')`` instead of being invoked
@@ -12,7 +13,11 @@ def includeme(config):
                      '/userarea_admin/restore_articles')
     
     # Article Routes
-    config.add_route('home', '/')
+    if config.get_settings().get("enable_pyracms_article_home"):
+        config.add_view(article_read, route_name='home', 
+                        renderer='article/article.jinja2', 
+                        permission='article_view')
+        config.add_route('home', '/')
     config.add_route('article_read', '/article/item/{page_id}')
     config.add_route('article_read_revision',
                      '/article/item/{page_id}/{revision}')

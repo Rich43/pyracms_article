@@ -15,8 +15,6 @@ from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
 u = UserLib()
 s = SettingsLib()
 
-@view_config(route_name='home', renderer='article/article.jinja2',
-             permission='article_view')
 @view_config(route_name='article_read', renderer='article/article.jinja2',
              permission='article_view')
 @view_config(route_name='article_read_revision',
