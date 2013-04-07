@@ -1,3 +1,4 @@
+from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
 from pyracms.lib.helperlib import redirect, get_username, rapid_deform
 from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.userlib import UserLib
@@ -10,7 +11,6 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import has_permission
 from pyramid.url import route_url
 from pyramid.view import view_config
-from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
 
 u = UserLib()
 s = SettingsLib()
