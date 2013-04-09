@@ -78,7 +78,7 @@ class ArticleLib():
         page = ArticlePage(name, display_name)
         revision = ArticleRevision(article, summary, user)
         page.revisions.append(revision)
-        default_renderer = s.show_setting("DEFAULTRENDERER").value
+        default_renderer = s.show_setting("DEFAULTRENDERER")
         page.renderer = DBSession.query(ArticleRenderers).filter_by(
                                                 name=default_renderer).one()
         self.t.set_tags(page, tags)
