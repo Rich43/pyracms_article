@@ -186,7 +186,10 @@ class ArticleLib():
         data = json.loads(data)
         def convert_date(date):
             date_format = "%Y-%m-%dT%H:%M:%S.%f"
-            return datetime.datetime.strptime(date, date_format)
+            try:
+                return datetime.datetime.strptime(date, date_format)
+            except TypeError:
+                return datetime.datetime(1900, 0, 0)
         # Convert the dates back
         for k, dummy in enumerate(data):
             data[k]['created'] = convert_date(data[k]['created'])
