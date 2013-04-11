@@ -190,6 +190,8 @@ class ArticleLib():
                 return datetime.datetime.strptime(date, date_format)
             except TypeError:
                 return datetime.datetime(1900, 1, 1)
+            except ValueError:
+                return datetime.datetime(1900, 1, 1)
         # Convert the dates back
         for k, dummy in enumerate(data):
             data[k]['created'] = convert_date(data[k]['created'])
