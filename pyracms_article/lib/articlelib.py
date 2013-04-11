@@ -189,7 +189,8 @@ class ArticleLib():
         u = UserLib()
         data = json.loads(data)
         def convert_date(date):
-            date_format = "%Y-%m-%dT%H:%M:%S.%f"
+            date = date.split(".")[0]
+            date_format = "%Y-%m-%dT%H:%M:%S"
             try:
                 return datetime.datetime.strptime(date, date_format)
             except TypeError:
