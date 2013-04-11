@@ -215,7 +215,8 @@ class ArticleLib():
                     setattr(page, k, v)
                 except:
                     pass
-            DBSession.flush()
+            DBSession.add(page)
+            page = self.show_page(row['name'])
             # Add revisions
             for row2 in revisions:
                 revision = ArticleRevision()
@@ -227,5 +228,3 @@ class ArticleLib():
                 page.revisions.append(revision)
                 self.update_article_index(request, page, revision, 
                                           u.show_by_id(revision.user_id).name)
-            # Commit changes
-            DBSession.add(page)
