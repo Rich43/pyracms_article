@@ -48,10 +48,14 @@ class ArticleLib():
         Update search index
         """
         w = WidgetLib()
+        rendered = ""
+        try:
+            rendered = w.render_article(page, revision.article)
+        except:
+            pass
         self.s.update_index(page.display_name, 
                             request.route_url("article_read", 
-                                              page_id=page.name), 
-                            w.render_article(page, revision.article), 
+                                              page_id=page.name), rendered, 
                             self.t.get_tags(page), revision.created, 
                             "article", page.name, username)
 
