@@ -215,6 +215,7 @@ class ArticleLib():
                     setattr(page, k, v)
                 except:
                     pass
+            DBSession.flush()
             # Add revisions
             for row2 in revisions:
                 revision = ArticleRevision()
