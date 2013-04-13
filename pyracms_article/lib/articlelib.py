@@ -1,5 +1,6 @@
-from ..models import (ArticleRevision, ArticlePage, ArticleRenderers, ArticleTags, 
-    ArticleVotes)
+from ..models import (ArticleRevision, ArticlePage, ArticleRenderers, 
+    ArticleTags, ArticleVotes)
+from jinja2.filters import do_striptags
 from pyracms.lib.helperlib import serialize_relation
 from pyracms.lib.searchlib import SearchLib
 from pyracms.lib.settingslib import SettingsLib
@@ -50,7 +51,7 @@ class ArticleLib():
         w = WidgetLib()
         rendered = ""
         try:
-            rendered = w.render_article(page, revision.article)
+            rendered = do_striptags(w.render_article(page, revision.article))
         except:
             pass
         self.s.update_index(page.display_name, 
