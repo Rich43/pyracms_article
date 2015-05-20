@@ -98,7 +98,6 @@ class ArticleLib():
         if not article:
             self.delete(page, user)
             return
-        page.deleted = False
         self.t.set_tags(page, tags)
         revision = ArticleRevision(article, summary, user)
         revision.page = page
@@ -119,9 +118,7 @@ class ArticleLib():
         Delete a page
         Raise PageNotFound if page does not exist
         """
-        revision = ArticleRevision("", "Deleted %s" % page.name, user)
-        page.revisions.append(revision)
-        page.deleted = True
+        DBSession.delete(page)
         self.s.delete_from_index(request.route_url("article_read", 
                                                    page_id=page.name))
 

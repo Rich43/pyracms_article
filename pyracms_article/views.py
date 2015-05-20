@@ -30,10 +30,7 @@ def article_read(context, request):
     try:
         page = c.show_page(page_id)
         revision = c.show_revision(page, revision_id)
-        if page.deleted:
-            return HTTPFound(location=route_url("article_update",
-                                                request, page_id=page.name))
-        elif page.private and not has_permission("set_private", context, 
+        if page.private and not has_permission("set_private", context,
                                                  request):
             raise Forbidden()
         else:
