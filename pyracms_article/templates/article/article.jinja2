@@ -6,9 +6,9 @@
     <h1>{{ page.display_name }}</h1>
     {% endif %}
     {% if revision %}
-        {{ w.render_article(page, revision.article) | safe }}
+        {{ w.render_article(page.renderer.name, revision.article) | safe }}
     {% else %}
-        {{ w.render_article(page, page.revisions[0].article) | safe }}
+        {{ w.render_article(page.renderer.name, page.revisions[0].article) | safe }}
     {% endif %}
     <p>
         {% if not revision %}

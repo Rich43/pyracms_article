@@ -39,7 +39,7 @@ class ArticleLib():
         """
         List all the pages
         """
-        pages = DBSession.query(ArticlePage).filter_by(deleted=False)
+        pages = DBSession.query(ArticlePage)
         if not pages:
             raise PageNotFound
         return [(page.name, page.display_name or page.name) for page in pages]
