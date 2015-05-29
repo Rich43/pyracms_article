@@ -1,19 +1,21 @@
 from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
 from pyracms.lib.helperlib import redirect, get_username, rapid_deform
 from pyracms.lib.settingslib import SettingsLib
+from pyracms.lib.taglib import TagLib, ARTICLE
 from pyracms.lib.userlib import UserLib
 from pyracms.views import ERROR, INFO
-from pyracms_article.deform_schemas.article import EditArticleSchema
-from pyracms_article.lib.articlelib import (ArticleLib, PageNotFound, 
-    AlreadyVoted)
 from pyramid.exceptions import Forbidden
-from pyramid.httpexceptions import HTTPFound
 from pyramid.security import has_permission
-from pyramid.url import route_url
 from pyramid.view import view_config
+
+from pyracms_article.deform_schemas.article import EditArticleSchema
+from pyracms_article.lib.articlelib import (ArticleLib, PageNotFound,
+                                            AlreadyVoted)
+from pyracms_article.models import ArticleTags
 
 u = UserLib()
 s = SettingsLib()
+
 
 @view_config(route_name='article_read', renderer='article/article.jinja2',
              permission='article_view')
@@ -31,13 +33,14 @@ def article_read(context, request):
         page = c.show_page(page_id)
         revision = c.show_revision(page, revision_id)
         if page.private and not has_permission("set_private", context,
-                                                 request):
+                                               request):
             raise Forbidden()
         else:
             result.update({'page': page, 'revision': revision})
             return result
     except PageNotFound:
         return redirect(request, "article_create", page_id=page_id)
+
 
 @view_config(route_name='article_delete', permission='article_delete')
 def article_delete(context, request):
@@ -56,6 +59,7 @@ def article_delete(context, request):
                               % page_id, ERROR)
         return redirect(request, "article_list")
 
+
 @view_config(route_name='article_list', permission='article_list',
              renderer='article/article_list.jinja2')
 def article_list(context, request):
@@ -64,6 +68,7 @@ def article_list(context, request):
     """
     c = ArticleLib()
     return {'pages': c.list()}
+
 
 @view_config(route_name='article_list_revisions',
              permission='article_list_revisions',
@@ -83,6 +88,7 @@ def article_list_revisions(context, request):
         return redirect(request, "article_list")
     return {'page': page}
 
+
 @view_config(route_name='article_update', permission='article_update',
              renderer='article/article_update.jinja2')
 def article_update(context, request):
@@ -90,6 +96,7 @@ def article_update(context, request):
     Display edit article form
     """
     c = ArticleLib()
+
     def article_update_submit(context, request, deserialized, bind_params):
         """
         Add a article revision to the database
@@ -103,12 +110,23 @@ def article_update(context, request):
         c.update(request, page, article, summary,
                  u.show(get_username(request)), tags)
         return redirect(request, "article_read", page_id=name)
-    matchdict_get = request.matchdict.get
-    page = c.show_page(matchdict_get('page_id'))
-    revision = c.show_revision(page, matchdict_get('revision'))
+
+    page_id = request.matchdict.get('page_id')
+    page = c.show_page(page_id)
+    revision = c.show_revision(page, request.matchdict.get('revision'))
+    t = TagLib(ArticleTags, ARTICLE)
+    display_name = page_id
+    article = ""
+    tags = ""
+    if page:
+        display_name = page.display_name
+        article = page.revisions[0].article
+        tags = t.get_tags(page)
     return rapid_deform(context, request, EditArticleSchema,
                         article_update_submit, page=page,
-                        revision=revision, cache=False)
+                        revision=revision, article=article,
+                        display_name=display_name, tags=tags)
+
 
 @view_config(route_name='article_create', permission='article_create',
              renderer='article/article_update.jinja2')
@@ -117,6 +135,7 @@ def article_create(context, request):
     Display create a new article form
     """
     c = ArticleLib()
+
     def article_create_submit(context, request, deserialized, bind_params):
         """
         Save new article to the database
@@ -129,9 +148,11 @@ def article_create(context, request):
         c.create(request, name, display_name, article, summary,
                  u.show(get_username(request)), tags)
         return redirect(request, "article_read", page_id=name)
+
     return rapid_deform(context, request, EditArticleSchema,
                         article_create_submit,
                         page_id=request.matchdict.get("page_id"))
+
 
 @view_config(route_name='article_revert', permission='article_revert')
 def article_revert(context, request):
@@ -153,6 +174,7 @@ def article_revert(context, request):
                               % matchdict_get('page_id'), ERROR)
         return redirect(request, "article_list")
 
+
 @view_config(route_name='article_switch_renderer', permission='switch_renderer')
 def article_switch_renderer(context, request):
     """
@@ -163,6 +185,7 @@ def article_switch_renderer(context, request):
     c.switch_renderer(page_id)
     return redirect(request, "article_read", page_id=page_id)
 
+
 @view_config(route_name='article_set_private', permission='set_private')
 def article_set_private(context, request):
     """
@@ -172,6 +195,7 @@ def article_set_private(context, request):
     page_id = request.matchdict.get('page_id')
     c.set_private(page_id)
     return redirect(request, "article_read", page_id=page_id)
+
 
 @view_config(route_name='article_add_vote', permission='vote')
 def article_add_vote(context, request):
@@ -189,6 +213,7 @@ def article_add_vote(context, request):
         request.session.flash(s.show_setting("ERROR_VOTE"), ERROR)
     return redirect(request, "article_read", page_id=vote_id)
 
+
 @view_config(route_name='userarea_admin_backup_articles', permission='backup')
 def userarea_admin_backup_articles(context, request):
     a = ArticleLib()
@@ -197,14 +222,16 @@ def userarea_admin_backup_articles(context, request):
     res.text = str(a.to_json())
     return res
 
+
 @view_config(route_name='userarea_admin_restore_articles', permission='backup',
              renderer='deform.jinja2')
 def userarea_admin_restore_articles(context, request):
     def restore_backup_submit(context, request, deserialized, bind_params):
         a = ArticleLib()
         a.from_json(request, deserialized['restore_backup_json_file']
-                    ['fp'].read().decode())
+        ['fp'].read().decode())
         return redirect(request, "article_list")
+
     result = rapid_deform(context, request, RestoreBackupSchema,
                           restore_backup_submit)
     if isinstance(result, dict):
