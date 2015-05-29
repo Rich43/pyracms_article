@@ -2,7 +2,7 @@
 {% from "widgets/vote_count.jinja2" import vote_count %}
 {% block title %} - Viewing {{ page.display_name }}{% endblock %}
 {% block content %}
-    {% if page.display_name %}
+    {% if not page.hide_display_name %}
     <h1>{{ page.display_name }}</h1>
     {% endif %}
     {% if revision %}
@@ -12,10 +12,16 @@
     {% endif %}
     <p>
         {% if not revision %}
-          {% if page.private %}{% set priv = "Public" %}{% else %}{% set priv = "Private" %}{% endif %}
+          {% if page.private %}{% set priv = "Public" %}{% else %}
+              {% set priv = "Private" %}{% endif %}
+          {% if page.hide_display_name %}{% set hideshow = "Show" %}{% else
+                  %}{% set hideshow = "Hide" %}{% endif %}
           {% for item in w.generate_menu("article_not_revision", context, request, 
-                                        {"page_id": page.name, "renderer": page.renderer.name,
-                                         "private": priv, "up_count": vote_count(page, True),
+                                        {"page_id": page.name,
+                                         "renderer": page.renderer.name,
+                                         "private": priv,
+                                         "hideshow":hideshow, "up_count":
+                                         vote_count(page, True),
                                      	 "down_count": vote_count(page, False)}): %}
             <a href="{{ item[0] }}">{{ item[1] }}</a> {% if not item[2] %}|{% endif %}
           {% endfor %}

@@ -196,6 +196,15 @@ def article_set_private(context, request):
     c.set_private(page_id)
     return redirect(request, "article_read", page_id=page_id)
 
+@view_config(route_name='article_hide_display_name', permission='set_private')
+def article_hide_display_name(context, request):
+    """
+    Hide display name header
+    """
+    c = ArticleLib()
+    page_id = request.matchdict.get('page_id')
+    c.hide_display_name(page_id)
+    return redirect(request, "article_read", page_id=page_id)
 
 @view_config(route_name='article_add_vote', permission='vote')
 def article_add_vote(context, request):

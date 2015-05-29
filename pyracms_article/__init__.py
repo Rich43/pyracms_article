@@ -32,6 +32,8 @@ def includeme(config):
     config.add_route('article_switch_renderer',
                      '/article/switch_renderer/{page_id}')
     config.add_route('article_set_private', '/article/set_private/{page_id}')
+    config.add_route('article_hide_display_name',
+                     '/article/hide_display_name/{page_id}')
     config.add_route('article_add_vote', '/vote/article/{vote_id}/{like}')
     
     config.scan("pyracms_article.views")

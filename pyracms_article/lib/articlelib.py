@@ -132,6 +132,14 @@ class ArticleLib():
         self.s.delete_from_index(request.route_url("article_read", 
                                                    page_id=page.name))
 
+    def hide_display_name(self, name):
+        """
+        Flip hide display name switch.
+        Raise PageNotFound if page does not exist.
+        """
+        page = self.show_page(name)
+        page.hide_display_name = not page.hide_display_name
+
     def show_revision(self, page, revision, error=False):
         """
         Get revision objects.
