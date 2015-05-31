@@ -53,6 +53,7 @@ class ArticlePage(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(128), index=True, unique=True, nullable=False)
     display_name = Column(Unicode(128), index=True, nullable=False)
+    hide_display_name = Column(Boolean, default=False, index=True)
     created = Column(DateTime, default=datetime.now)
     private = Column(Boolean, default=False, index=True)
     view_count = Column(Integer, default=0, index=True)
