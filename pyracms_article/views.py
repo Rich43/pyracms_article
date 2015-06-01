@@ -50,7 +50,7 @@ def article_delete(context, request):
     c = ArticleLib()
     page_id = request.matchdict.get('page_id')
     try:
-        c.delete(request, c.show_page(page_id), u.show(get_username(request)))
+        c.delete(request, c.show_page(page_id))
         request.session.flash(s.show_setting("INFO_DELETED")
                               % page_id, INFO)
         return redirect(request, "article_list")

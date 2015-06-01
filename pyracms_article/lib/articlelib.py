@@ -86,6 +86,13 @@ class ArticleLib():
         default_renderer = s.show_setting("DEFAULTRENDERER")
         page.renderer = DBSession.query(ArticleRenderers).filter_by(
                                                 name=default_renderer).one()
+        if s.has_setting("PYRACMS_FORUM"):
+            from pyracms_forum.lib.boardlib import BoardLib
+            page.thread_id = BoardLib().add_thread(name, display_name, "", user, add_post=False).id
+        if s.has_setting("PYRACMS_GALLERY"):
+            from pyracms_gallery.lib.gallerylib import GalleryLib
+            album = GalleryLib().create_album(name, display_name, user)
+            page.album_id = album
         self.t.set_tags(page, tags)
         self.update_article_index(request, page, revision, user.name)
         DBSession.add(page)
@@ -113,11 +120,17 @@ class ArticleLib():
         message = "Reverted revision %s" % revision.id
         self.update(request, page, revision.article, message, user)
 
-    def delete(self, request, page, user):
+    def delete(self, request, page):
         """
         Delete a page
         Raise PageNotFound if page does not exist
         """
+        if page.thread_id != -1:
+            from pyracms_forum.lib.boardlib import BoardLib
+            BoardLib().delete_thread(page.thread_id)
+        if page.album_id != -1:
+            from pyracms_gallery.lib.gallerylib import GalleryLib
+            GalleryLib().delete_album(page.album_id, request)
         DBSession.delete(page)
         self.s.delete_from_index(request.route_url("article_read", 
                                                    page_id=page.name))
