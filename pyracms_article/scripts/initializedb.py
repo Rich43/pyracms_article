@@ -67,31 +67,32 @@ def main(argv=sys.argv):
                            9, group, 'backup'))
         
         group = MenuGroup("article_not_revision")
-        if s.has_setting("PYRACMS_FORUM"):
-            DBSession.add(Menu("Comments", "/article/item/%(page_id)s?comments",
-                          0, group, 'forum_view'))
+        DBSession.add(Menu("Comments", "/article/item/%(page_id)s?comments",
+                           1, group, 'forum_view'))
+        DBSession.add(Menu("Gallery", "/gallery/album/%(album_id)s",
+                           2, group, 'show_album'))
         DBSession.add(Menu("Edit", "/article/update/%(page_id)s", 
-                           1, group, 'article_update'))
+                           3, group, 'article_update'))
         DBSession.add(Menu("Delete", "/article/delete/%(page_id)s", 
-                           2, group, 'article_delete'))
+                           4, group, 'article_delete'))
         DBSession.add(Menu("Switch Renderer [%(renderer)s]",
                            "/article/switch_renderer/%(page_id)s", 
-                           3, group, 'switch_renderer'))
+                           5, group, 'switch_renderer'))
         DBSession.add(Menu("Make %(private)s",
                            "/article/set_private/%(page_id)s", 
-                           4, group, 'set_private'))
+                           6, group, 'set_private'))
         DBSession.add(Menu("%(hideshow)s Display Name",
                            "/article/hide_display_name/%(page_id)s",
-                           5, group, 'set_private'))
+                           7, group, 'set_private'))
         DBSession.add(Menu("Vote Up (%(up_count)s)", 
-                           "/vote/article/%(page_id)s/True", 6,
+                           "/vote/article/%(page_id)s/True", 8,
                            group, 'vote'))
         DBSession.add(Menu("Vote Down (%(down_count)s)", 
-                           "/vote/article/%(page_id)s/False", 7,
+                           "/vote/article/%(page_id)s/False", 9,
                            group, 'vote'))
         DBSession.add(Menu("List Revisions",
                            "/article/list_revisions/%(page_id)s",
-                           8, group, 'article_list_revisions'))
+                           10, group, 'article_list_revisions'))
         
         group = MenuGroup("article_revision")
         DBSession.add(Menu("List Revisions",
