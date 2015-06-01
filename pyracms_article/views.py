@@ -36,7 +36,11 @@ def article_read(context, request):
                                                request):
             raise Forbidden()
         else:
-            result.update({'page': page, 'revision': revision})
+            result.update({'page': page, 'revision': revision, "thread_enabled": False})
+            if request.query_string.startswith("comments") and page.thread_id != -1:
+                from pyracms_forum.views import get_thread
+                result.update(get_thread(context, request, page.thread_id))
+                result.update({"thread_enabled": True})
             return result
     except PageNotFound:
         return redirect(request, "article_create", page_id=page_id)

@@ -1,5 +1,8 @@
 {% extends "main.jinja2" %}
 {% from "widgets/vote_count.jinja2" import vote_count %}
+{% if thread_enabled %}
+{% from "pyracms_forum:templates/widgets/comments.jinja2" import comments %}
+{% endif %}
 {% block title %} - Viewing {{ page.display_name }}{% endblock %}
 {% block content %}
     {% if not page.hide_display_name %}
@@ -9,6 +12,9 @@
         {{ w.render_article(page.renderer.name, revision.article) | safe }}
     {% else %}
         {{ w.render_article(page.renderer.name, page.revisions[0].article) | safe }}
+    {% endif %}
+    {%  if thread_enabled %}
+    {{ comments(request, thread, form, forum_reply, w) }}
     {% endif %}
     <p>
         {% if not revision %}
