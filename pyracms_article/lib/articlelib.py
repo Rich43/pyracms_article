@@ -88,7 +88,8 @@ class ArticleLib():
                                                 name=default_renderer).one()
         if s.has_setting("PYRACMS_FORUM"):
             from pyracms_forum.lib.boardlib import BoardLib
-            page.thread_id = BoardLib().add_thread(name, display_name, "", user, add_post=False).id
+            page.thread_id = BoardLib().add_thread(name, display_name, "",
+                                                   user, add_post=False).id
         if s.has_setting("PYRACMS_GALLERY"):
             from pyracms_gallery.lib.gallerylib import GalleryLib
             album = GalleryLib().create_album(name, display_name, user)

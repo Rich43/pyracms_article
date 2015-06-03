@@ -31,9 +31,8 @@ def main(argv=sys.argv):
     with transaction.manager:
         # Add Groups
         u = UserLib()
-        admin_user = u.show("admin")
         u.create_group("article", "Ability to Add, Edit, Delete, " +
-                       "Revert and Protect Articles.", [admin_user])
+                       "Revert and Protect Articles.")
     
         # Default ACL
         acl = RootFactory(session=DBSession)
@@ -53,6 +52,8 @@ def main(argv=sys.argv):
         # Add settings
         s = SettingsLib()
         s.create("PYRACMS_ARTICLE")
+        s.update("DEFAULTGROUPS", s.show_setting("DEFAULTGROUPS") +
+                 "article\n")
 
         # Add Menu Items
         m = MenuLib()
