@@ -58,49 +58,49 @@ def main(argv=sys.argv):
         # Add Menu Items
         m = MenuLib()
         group = m.show_group("main_menu")
-        DBSession.add(Menu("Articles", "/article/list", 2, group, Everyone))
+        m.add_menu_item_url("Articles", "/article/list", 2, group, Everyone)
         
         group = m.show_group("admin_area")
-        DBSession.add(Menu("Backup Articles", "/userarea_admin/backup_articles",
-                           8, group, 'backup'))
-        DBSession.add(Menu("Restore Articles", 
-                           "/userarea_admin/restore_articles", 
-                           9, group, 'backup'))
+        m.add_menu_item_url("Backup Articles", "/userarea_admin/backup_articles",
+                            8, group, 'backup')
+        m.add_menu_item_url("Restore Articles", 
+                            "/userarea_admin/restore_articles",
+                            9, group, 'backup')
         
         group = MenuGroup("article_not_revision")
-        DBSession.add(Menu("Comments", "/article/item/%(page_id)s?comments",
-                           1, group, 'forum_view'))
-        DBSession.add(Menu("Gallery", "/gallery/album/%(album_id)s",
-                           2, group, 'show_album'))
-        DBSession.add(Menu("Edit", "/article/update/%(page_id)s", 
-                           3, group, 'article_update'))
-        DBSession.add(Menu("Delete", "/article/delete/%(page_id)s", 
-                           4, group, 'article_delete'))
-        DBSession.add(Menu("Switch Renderer [%(renderer)s]",
-                           "/article/switch_renderer/%(page_id)s", 
-                           5, group, 'switch_renderer'))
-        DBSession.add(Menu("Make %(private)s",
-                           "/article/set_private/%(page_id)s", 
-                           6, group, 'set_private'))
-        DBSession.add(Menu("%(hideshow)s Display Name",
-                           "/article/hide_display_name/%(page_id)s",
-                           7, group, 'set_private'))
-        DBSession.add(Menu("Vote Up (%(up_count)s)", 
-                           "/vote/article/%(page_id)s/True", 8,
-                           group, 'vote'))
-        DBSession.add(Menu("Vote Down (%(down_count)s)", 
-                           "/vote/article/%(page_id)s/False", 9,
-                           group, 'vote'))
-        DBSession.add(Menu("List Revisions",
-                           "/article/list_revisions/%(page_id)s",
-                           10, group, 'article_list_revisions'))
+        m.add_menu_item_url("Comments", "/article/item/%(page_id)s?comments",
+                            1, group, 'forum_view')
+        m.add_menu_item_url("Gallery", "/gallery/album/%(album_id)s",
+                            2, group, 'show_album')
+        m.add_menu_item_url("Edit", "/article/update/%(page_id)s", 
+                            3, group, 'article_update')
+        m.add_menu_item_url("Delete", "/article/delete/%(page_id)s", 
+                            4, group, 'article_delete')
+        m.add_menu_item_url("Switch Renderer [%(renderer)s]",
+                            "/article/switch_renderer/%(page_id)s",
+                            5, group, 'switch_renderer')
+        m.add_menu_item_url("Make %(private)s",
+                            "/article/set_private/%(page_id)s",
+                            6, group, 'set_private')
+        m.add_menu_item_url("%(hideshow)s Display Name",
+                            "/article/hide_display_name/%(page_id)s",
+                            7, group, 'set_private')
+        m.add_menu_item_url("Vote Up (%(up_count)s)", 
+                            "/vote/article/%(page_id)s/True", 8,
+                            group, 'vote')
+        m.add_menu_item_url("Vote Down (%(down_count)s)", 
+                            "/vote/article/%(page_id)s/False", 9,
+                            group, 'vote')
+        m.add_menu_item_url("List Revisions",
+                            "/article/list_revisions/%(page_id)s",
+                            10, group, 'article_list_revisions')
         
         group = MenuGroup("article_revision")
-        DBSession.add(Menu("List Revisions",
-                           "/article/list_revisions/%(page_id)s", 1, group))
-        DBSession.add(Menu("Revert",
-                           "/article/revert/%(page_id)s/%(revision)s", 
-                           2, group))
+        m.add_menu_item_url("List Revisions",
+                            "/article/list_revisions/%(page_id)s", 1, group)
+        m.add_menu_item_url("Revert",
+                            "/article/revert/%(page_id)s/%(revision)s",
+                            2, group)
         
         # Add Renderers
         DBSession.add(ArticleRenderers("HTML"))
