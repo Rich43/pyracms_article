@@ -8,6 +8,6 @@ class EditArticleSchema(MappingSchema):
     display_name = SchemaNode(String(), widget=TextInputWidget(size=40),
                               missing='')
     article = SchemaNode(String(), widget=TextAreaWidget(cols=140, rows=20))
-    summary = SchemaNode(String(), widget=TextInputWidget(size=40))
+    summary = SchemaNode(String(), widget=TextInputWidget(size=40), missing='')
     tags = SchemaNode(String(), widget=TextInputWidget(size=40),
                       missing='')

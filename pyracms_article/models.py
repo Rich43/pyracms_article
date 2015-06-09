@@ -24,7 +24,7 @@ class ArticleRevision(Base):
     id = Column(Integer, primary_key=True)
     page_id = Column(Integer, ForeignKey('articlepage.id'), nullable=False)
     article = Column(UnicodeText, default='')
-    summary = Column(Unicode(128), index=True, nullable=False)
+    summary = Column(Unicode(128), index=True, nullable=True, default='')
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     user = relationship(User)
     page = relationship("ArticlePage")
