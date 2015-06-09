@@ -58,49 +58,46 @@ def main(argv=sys.argv):
         # Add Menu Items
         m = MenuLib()
         group = m.show_group("main_menu")
-        m.add_menu_item_url("Articles", "/article/list", 2, group, Everyone)
+        m.add_menu_item_route("Articles", "article_list", 2, group, Everyone)
         
         group = m.show_group("admin_area")
-        m.add_menu_item_url("Backup Articles", "/userarea_admin/backup_articles",
-                            8, group, 'backup')
-        m.add_menu_item_url("Restore Articles", 
-                            "/userarea_admin/restore_articles",
-                            9, group, 'backup')
+        m.add_menu_item_route("Backup Articles",
+                              "userarea_admin_backup_articles",
+                              8, group, 'backup')
+        m.add_menu_item_route("Restore Articles",
+                              "userarea_admin_restore_articles",
+                              9, group, 'backup')
         
         group = MenuGroup("article_not_revision")
         m.add_menu_item_url("Comments", "/article/item/%(page_id)s?comments",
                             1, group, 'forum_view')
-        m.add_menu_item_url("Gallery", "/gallery/album/%(album_id)s",
-                            2, group, 'show_album')
-        m.add_menu_item_url("Edit", "/article/update/%(page_id)s", 
-                            3, group, 'article_update')
-        m.add_menu_item_url("Delete", "/article/delete/%(page_id)s", 
-                            4, group, 'article_delete')
-        m.add_menu_item_url("Switch Renderer [%(renderer)s]",
-                            "/article/switch_renderer/%(page_id)s",
-                            5, group, 'switch_renderer')
-        m.add_menu_item_url("Make %(private)s",
-                            "/article/set_private/%(page_id)s",
-                            6, group, 'set_private')
-        m.add_menu_item_url("%(hideshow)s Display Name",
-                            "/article/hide_display_name/%(page_id)s",
-                            7, group, 'set_private')
+        m.add_menu_item_route("Gallery", "show_album", 2, group, 'show_album')
+        m.add_menu_item_route("Edit", "article_update", 3, group,
+                              'article_update')
+        m.add_menu_item_route("Delete", "article_delete", 4, group,
+                              'article_delete')
+        m.add_menu_item_route("Switch Renderer [%(renderer)s]",
+                              "article_switch_renderer", 5, group,
+                              'switch_renderer')
+        m.add_menu_item_route("Make %(private)s", "article_set_private",
+                              6, group, 'set_private')
+        m.add_menu_item_route("%(hideshow)s Display Name",
+                              "article_hide_display_name", 7, group,
+                              'set_private')
         m.add_menu_item_url("Vote Up (%(up_count)s)", 
                             "/vote/article/%(page_id)s/True", 8,
                             group, 'vote')
         m.add_menu_item_url("Vote Down (%(down_count)s)", 
                             "/vote/article/%(page_id)s/False", 9,
                             group, 'vote')
-        m.add_menu_item_url("List Revisions",
-                            "/article/list_revisions/%(page_id)s",
-                            10, group, 'article_list_revisions')
+        m.add_menu_item_route("List Revisions", "article_list_revisions",
+                              10, group, 'article_list_revisions')
         
         group = MenuGroup("article_revision")
-        m.add_menu_item_url("List Revisions",
-                            "/article/list_revisions/%(page_id)s", 1, group)
-        m.add_menu_item_url("Revert",
-                            "/article/revert/%(page_id)s/%(revision)s",
-                            2, group)
+        m.add_menu_item_route("List Revisions", "article_list_revisions",
+                              1, group, 'article_list_revisions')
+        m.add_menu_item_route("Revert", "article_revert",
+                              2, group, "article_revert")
         
         # Add Renderers
         DBSession.add(ArticleRenderers("HTML"))
