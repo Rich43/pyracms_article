@@ -26,6 +26,8 @@ class PageFound(Exception):
 class AlreadyVoted(Exception):
     pass
 
+s = SettingsLib()
+
 class ArticleLib():
     """
     A library to manage the article database.
@@ -68,6 +70,17 @@ class ArticleLib():
             return
         page.renderer_id += 1
 
+    def add_addons(self, page, name, display_name, user):
+        if s.has_setting("PYRACMS_FORUM"):
+            from pyracms_forum.lib.boardlib import BoardLib
+            page.thread_id = BoardLib().add_thread(name, display_name, "",
+                                                   user, add_post=False).id
+        if s.has_setting("PYRACMS_GALLERY"):
+            from pyracms_gallery.lib.gallerylib import GalleryLib
+            album = GalleryLib().create_album(name, display_name, user)
+            page.album_id = album
+        return page
+
     def create(self, request, name, display_name, article, summary, user,
                tags=''):
         """
@@ -79,21 +92,13 @@ class ArticleLib():
             raise PageFound
         except PageNotFound:
             pass
-        s = SettingsLib()
         page = ArticlePage(name, display_name)
         revision = ArticleRevision(article, summary, user)
         page.revisions.append(revision)
         default_renderer = s.show_setting("DEFAULTRENDERER")
         page.renderer = DBSession.query(ArticleRenderers).filter_by(
                                                 name=default_renderer).one()
-        if s.has_setting("PYRACMS_FORUM"):
-            from pyracms_forum.lib.boardlib import BoardLib
-            page.thread_id = BoardLib().add_thread(name, display_name, "",
-                                                   user, add_post=False).id
-        if s.has_setting("PYRACMS_GALLERY"):
-            from pyracms_gallery.lib.gallerylib import GalleryLib
-            album = GalleryLib().create_album(name, display_name, user)
-            page.album_id = album
+        page = self.add_addons(page, name, display_name, user)
         self.t.set_tags(page, tags)
         self.update_article_index(request, page, revision, user.name)
         DBSession.add(page)
@@ -243,6 +248,8 @@ class ArticleLib():
                     pass
             DBSession.add(page)
             page = self.show_page(row['name'])
+
+            user = None
             # Add revisions
             for row2 in revisions:
                 revision = ArticleRevision()
@@ -252,5 +259,8 @@ class ArticleLib():
                     except:
                         pass
                 page.revisions.append(revision)
-                self.update_article_index(request, page, revision, 
-                                          u.show_by_id(revision.user_id).name)
+                user = u.show_by_id(revision.user_id)
+                self.update_article_index(request, page, revision, user.name)
+            if user:
+                page = self.add_addons(page, row['name'],
+                                       row['display_name'], user)
