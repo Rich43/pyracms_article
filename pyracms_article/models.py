@@ -57,6 +57,8 @@ class ArticlePage(Base):
     created = Column(DateTime, default=datetime.now)
     private = Column(Boolean, default=False, index=True)
     view_count = Column(Integer, default=0, index=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user = relationship(User)
     thread_id = Column(Integer, nullable=False, default=-1)
     album_id = Column(Integer, nullable=False, default=-1)
     renderer_id = Column(Integer, ForeignKey('articlerenderers.id'),

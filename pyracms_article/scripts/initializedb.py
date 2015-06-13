@@ -38,6 +38,7 @@ def main(argv=sys.argv):
         acl = RootFactory(session=DBSession)
         acl.__acl__.append((Allow, "group:admin", "switch_renderer"))
         acl.__acl__.append((Allow, "group:admin", "set_private"))
+        acl.__acl__.append((Allow, "group:admin", "article_mod"))
         acl.__acl__.append((Allow, Authenticated, "article_list_revisions"))
         acl.__acl__.append((Allow, Everyone, "article_view"))
         acl.__acl__.append((Allow, Everyone, "article_list"))

@@ -93,6 +93,7 @@ class ArticleLib():
         except PageNotFound:
             pass
         page = ArticlePage(name, display_name)
+        page.user = user
         revision = ArticleRevision(article, summary, user)
         page.revisions.append(revision)
         default_renderer = s.show_setting("DEFAULTRENDERER")
@@ -246,6 +247,8 @@ class ArticleLib():
                     setattr(page, k, v)
                 except:
                     pass
+            if not page.user_id:
+                page.user_id = 1
             DBSession.add(page)
             page = self.show_page(row['name'])
 

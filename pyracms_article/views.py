@@ -4,7 +4,7 @@ from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.taglib import TagLib, ARTICLE
 from pyracms.lib.userlib import UserLib
 from pyracms.views import ERROR, INFO
-from pyramid.exceptions import Forbidden
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import has_permission
 from pyramid.view import view_config
 
@@ -16,6 +16,15 @@ from pyracms_article.models import ArticleTags
 u = UserLib()
 s = SettingsLib()
 
+def check_owner(context, request):
+    page_id = request.matchdict.get('page_id')
+    g = ArticleLib()
+    page = g.show_page(page_id)
+    if (has_permission('article_mod', context, request) or
+        page.user == u.show(get_username(request))):
+        return True
+    else:
+        raise HTTPForbidden
 
 @view_config(route_name='article_read', renderer='article/article.jinja2',
              permission='article_view')
@@ -34,7 +43,7 @@ def article_read(context, request):
         revision = c.show_revision(page, revision_id)
         if page.private and not has_permission("set_private", context,
                                                request):
-            raise Forbidden()
+            raise HTTPForbidden
         else:
             result.update({'page': page, 'revision': revision, "thread_enabled": False})
             if request.query_string.startswith("comments") and page.thread_id != -1:
@@ -51,6 +60,7 @@ def article_delete(context, request):
     """
     Delete an article
     """
+    check_owner(context, request)
     c = ArticleLib()
     page_id = request.matchdict.get('page_id')
     try:
@@ -99,6 +109,7 @@ def article_update(context, request):
     """
     Display edit article form
     """
+    check_owner(context, request)
     c = ArticleLib()
 
     def article_update_submit(context, request, deserialized, bind_params):
@@ -163,6 +174,7 @@ def article_revert(context, request):
     """
     Revert an old revision, basically makes a new revision with old contents
     """
+    check_owner(context, request)
     c = ArticleLib()
     matchdict_get = request.matchdict.get
     try:
