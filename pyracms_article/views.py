@@ -209,7 +209,7 @@ def article_set_private(context, request):
     """
     c = ArticleLib()
     page_id = request.matchdict.get('page_id')
-    c.set_private(page_id)
+    c.set_private(request, page_id)
     return redirect(request, "article_read", page_id=page_id)
 
 @view_config(route_name='article_hide_display_name', permission='set_private')
