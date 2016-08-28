@@ -1,5 +1,5 @@
 from datetime import datetime
-from pyracms.models import Base, User
+from pyracms.models import Base, JsonBase, User
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.sql.expression import desc
@@ -17,9 +17,10 @@ class ArticleTags(Base):
     def __init__(self, name):
         self.name = name
 
-class ArticleRevision(Base):
+class ArticleRevision(Base, JsonBase):
     __tablename__ = 'articlerevision'
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    __json__ = ["article", "summary"]
 
     id = Column(Integer, primary_key=True)
     page_id = Column(Integer, ForeignKey('articlepage.id'), nullable=False)
@@ -46,9 +47,11 @@ class ArticleRenderers(Base):
     def __init__(self, name):
         self.name = name
 
-class ArticlePage(Base):
+class ArticlePage(Base, JsonBase):
     __tablename__ = 'articlepage'
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    __json__ = ["name", "display_name", "hide_display_name", "private",
+                "view_count"]
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(128), index=True, unique=True, nullable=False)

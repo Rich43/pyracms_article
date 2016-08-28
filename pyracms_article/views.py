@@ -1,5 +1,5 @@
 from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
-from pyracms.lib.helperlib import redirect, get_username, rapid_deform
+from pyracms.lib.helperlib import redirect, get_username, rapid_deform, display_json
 from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.taglib import TagLib, ARTICLE
 from pyracms.lib.userlib import UserLib
@@ -7,7 +7,6 @@ from pyracms.views import ERROR, INFO
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import has_permission
 from pyramid.view import view_config
-
 from pyracms_article.deform_schemas.article import EditArticleSchema
 from pyracms_article.lib.articlelib import (ArticleLib, PageNotFound,
                                             AlreadyVoted)
@@ -40,20 +39,30 @@ def article_read(context, request):
     revision_id = request.matchdict.get('revision')
     try:
         page = c.show_page(page_id)
-        revision = c.show_revision(page, revision_id)
+        if revision_id:
+            revision = c.show_revision(page, revision_id)
+        else:
+            revision = page.revisions[0]
         if page.private and not has_permission("set_private", context,
                                                request):
             raise HTTPForbidden
         else:
-            result.update({'page': page, 'revision': revision, "thread_enabled": False})
-            if request.query_string.startswith("comments") and page.thread_id != -1:
+            if request.query_string.startswith("json"):
+                data = page.to_dict()
+                data.update(revision.to_dict())
+                return display_json(request, page.make_json(data))
+
+            result.update({'page': page, 'revision': revision,
+                           "thread_enabled": False})
+
+            if (request.query_string.startswith("comments") and
+                        page.thread_id != -1):
                 from pyracms_forum.views import get_thread
                 result.update(get_thread(context, request, page.thread_id))
                 result.update({"thread_enabled": True})
             return result
     except PageNotFound:
         return redirect(request, "article_create", page_id=page_id)
-
 
 @view_config(route_name='article_delete', permission='article_delete')
 def article_delete(context, request):
@@ -242,11 +251,7 @@ def article_add_vote(context, request):
 @view_config(route_name='userarea_admin_backup_articles', permission='backup')
 def userarea_admin_backup_articles(context, request):
     a = ArticleLib()
-    res = request.response
-    res.content_type = "application/json"
-    res.text = str(a.to_json())
-    return res
-
+    return display_json(request, a.to_json())
 
 @view_config(route_name='userarea_admin_restore_articles', permission='backup',
              renderer='deform.jinja2')
