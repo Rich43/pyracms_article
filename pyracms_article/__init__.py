@@ -37,3 +37,4 @@ def includeme(config):
     config.add_route('article_add_vote', '/vote/article/{vote_id}/{like}')
     
     config.scan("pyracms_article.views")
+    config.scan("pyracms_article.web_service_views")

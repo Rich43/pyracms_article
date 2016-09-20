@@ -1,29 +1,32 @@
 from pyracms.deform_schemas.userarea_admin import RestoreBackupSchema
-from pyracms.lib.helperlib import redirect, get_username, rapid_deform, display_json
+from pyracms.lib.helperlib import (redirect, get_username, rapid_deform,
+                                   display_json)
 from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.taglib import TagLib, ARTICLE
 from pyracms.lib.userlib import UserLib
 from pyracms.views import ERROR, INFO
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.security import has_permission
-from pyramid.view import view_config
 from pyracms_article.deform_schemas.article import EditArticleSchema
 from pyracms_article.lib.articlelib import (ArticleLib, PageNotFound,
                                             AlreadyVoted)
 from pyracms_article.models import ArticleTags
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.security import has_permission
+from pyramid.view import view_config
 
 u = UserLib()
 s = SettingsLib()
+
 
 def check_owner(context, request):
     page_id = request.matchdict.get('page_id')
     g = ArticleLib()
     page = g.show_page(page_id)
     if (has_permission('article_mod', context, request) or
-        page.user == u.show(get_username(request))):
+                page.user == u.show(get_username(request))):
         return True
     else:
         raise HTTPForbidden
+
 
 @view_config(route_name='article_read', renderer='article/article.jinja2',
              permission='article_view')
@@ -47,11 +50,6 @@ def article_read(context, request):
                                                request):
             raise HTTPForbidden
         else:
-            if request.query_string.startswith("json"):
-                data = page.to_dict()
-                data.update(revision.to_dict())
-                return display_json(request, page.make_json(data))
-
             result.update({'page': page, 'revision': revision,
                            "thread_enabled": False})
 
@@ -63,6 +61,7 @@ def article_read(context, request):
             return result
     except PageNotFound:
         return redirect(request, "article_create", page_id=page_id)
+
 
 @view_config(route_name='article_delete', permission='article_delete')
 def article_delete(context, request):
@@ -221,6 +220,7 @@ def article_set_private(context, request):
     c.set_private(request, page_id)
     return redirect(request, "article_read", page_id=page_id)
 
+
 @view_config(route_name='article_hide_display_name', permission='set_private')
 def article_hide_display_name(context, request):
     """
@@ -230,6 +230,7 @@ def article_hide_display_name(context, request):
     page_id = request.matchdict.get('page_id')
     c.hide_display_name(page_id)
     return redirect(request, "article_read", page_id=page_id)
+
 
 @view_config(route_name='article_add_vote', permission='vote')
 def article_add_vote(context, request):
@@ -252,6 +253,7 @@ def article_add_vote(context, request):
 def userarea_admin_backup_articles(context, request):
     a = ArticleLib()
     return display_json(request, a.to_json())
+
 
 @view_config(route_name='userarea_admin_restore_articles', permission='backup',
              renderer='deform.jinja2')
