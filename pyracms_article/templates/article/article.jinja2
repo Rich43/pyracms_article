@@ -13,7 +13,7 @@
     {{ comments(request, thread, form, forum_reply, w) }}
     {% endif %}
     <p>
-        {% if not revision %}
+        {% if not revision_id %}
           {% if page.private %}{% set priv = "Public" %}{% else %}
               {% set priv = "Private" %}{% endif %}
           {% if page.hide_display_name %}{% set hideshow = "Show" %}{% else
@@ -31,7 +31,7 @@
           {% endfor %}
         {% endif %}
         
-        {% if revision %}
+        {% if revision_id %}
           {% for item in w.generate_menu("article_revision", context, request, 
                                 {"page_id": page.name, "revision": revision.id}): %}
           <a href="{{ item[0] }}">{{ item[1] }}</a> {% if not item[2] %}|{%

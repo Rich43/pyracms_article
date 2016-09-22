@@ -51,6 +51,7 @@ def article_read(context, request):
             raise HTTPForbidden
         else:
             result.update({'page': page, 'revision': revision,
+                           "revision_id": revision_id,
                            "thread_enabled": False})
 
             if (request.query_string.startswith("comments") and
