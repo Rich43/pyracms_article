@@ -1,11 +1,11 @@
 from cornice import Service
 from pyracms.lib.userlib import UserLib
-from pyracms.web_service_views import valid_token
+from pyracms.web_service_views import valid_token, valid_permission
 
 from .deform_schemas.article import EditArticleSchema
 from .lib.articlelib import ArticleLib, PageNotFound, PageFound
 
-article = Service(name='article', path='/api/article/item/{page_id}',
+article = Service(name='api_article', path='/api/article/item/{page_id}',
                   description="Create, read, update, delete articles")
 c = ArticleLib()
 u = UserLib()
@@ -89,3 +89,22 @@ def api_article_update(request):
         return {"info": "updated"}
     except PageNotFound:
         request.errors.add('article', 'not_found', 'Page not found')
+
+
+@article.delete(validators=valid_token)
+def api_article_delete(request):
+    if not valid_permission(request, "article_delete"):
+        request.errors.add('article', 'access_denied', 'Access denied')
+        return
+    page_id = request.matchdict.get('page_id')
+    try:
+        c.delete(request, c.show_page(page_id))
+        return {"info": "deleted"}
+    except PageNotFound:
+        request.errors.add('article', 'not_found', 'Page Not Found')
+
+
+article_list = Service(name='api_article_list', path='/api/article/list')
+@article_list.get()
+def api_article_list(request):
+    return c.list()
