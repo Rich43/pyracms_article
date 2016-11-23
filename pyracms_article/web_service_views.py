@@ -32,11 +32,11 @@ def api_article_read(request):
         else:
             revision = page.revisions[0]
         if page.private:
-            request.errors.add('article', 'private', 'This page is private')
+            request.errors.add('body', 'private', 'This page is private')
         else:
             return {'page': page.to_dict(), 'revision': revision.to_dict()}
     except PageNotFound:
-        request.errors.add('article', 'not_found', 'Page Not Found')
+        request.errors.add('querystring', 'not_found', 'Page Not Found')
 
 
 @article.post(schema=EditArticleSchema, validators=valid_token)
@@ -71,7 +71,7 @@ def api_article_create(request):
                  user, tags)
         return {"info": "created"}
     except PageFound:
-        request.errors.add('article', 'found', 'A page already exists')
+        request.errors.add('querystring', 'found', 'A page already exists')
 
 
 @article.patch(schema=EditArticleSchema, validators=valid_token)
@@ -88,20 +88,20 @@ def api_article_update(request):
         c.update(request, page, article, summary, user, tags)
         return {"info": "updated"}
     except PageNotFound:
-        request.errors.add('article', 'not_found', 'Page not found')
+        request.errors.add('querystring', 'not_found', 'Page not found')
 
 
 @article.delete(validators=valid_token)
 def api_article_delete(request):
     if not valid_permission(request, "article_delete"):
-        request.errors.add('article', 'access_denied', 'Access denied')
+        request.errors.add('body', 'access_denied', 'Access denied')
         return
     page_id = request.matchdict.get('page_id')
     try:
         c.delete(request, c.show_page(page_id))
         return {"info": "deleted"}
     except PageNotFound:
-        request.errors.add('article', 'not_found', 'Page Not Found')
+        request.errors.add('querystring', 'not_found', 'Page Not Found')
 
 
 article_list = Service(name='api_article_list', path='/api/article/list')
