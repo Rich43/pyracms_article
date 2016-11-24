@@ -1,4 +1,9 @@
+"""
+TODO: Beef up security, check permissions
+"""
 from cornice import Service
+from cornice.validators import colander_body_validator
+
 from pyracms.lib.userlib import UserLib
 from pyracms.web_service_views import valid_token, valid_permission
 
@@ -34,59 +39,45 @@ def api_article_read(request):
         if page.private:
             request.errors.add('body', 'private', 'This page is private')
         else:
+            # TODO: Iterate revisions and list them
             return {'page': page.to_dict(), 'revision': revision.to_dict()}
     except PageNotFound:
         request.errors.add('querystring', 'not_found', 'Page Not Found')
 
 
-@article.post(schema=EditArticleSchema, validators=valid_token)
-def api_article_create_update(request):
-    """
-    Creates or Updates an article depending on if it exists or not.
-    Accepts: display_name, article, summary, tags
-    """
-    page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    user = u.show("admin")
-    try:
-        page = c.show_page(page_id)
-        page.display_name = display_name
-        c.update(request, page, article, summary, user, tags)
-        return {"info": "updated"}
-    except PageNotFound:
-        c.create(request, page_id, display_name, article, summary,
-                 user, tags)
-        return {"info": "created"}
-
-
-@article.put(schema=EditArticleSchema, validators=valid_token)
+@article.put(schema=EditArticleSchema, validators=(valid_token,
+                                                   colander_body_validator))
 def api_article_create(request):
     """
     Creates an article.
     Accepts: display_name, article, summary, tags
     """
+    # TODO: Create a BBThread
+    # TODO: Create a Gallery
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    user = u.show("admin")
+    user = u.show("admin") # TODO: lookup user
     try:
         c.create(request, page_id, display_name, article, summary,
                  user, tags)
-        return {"info": "created"}
+        return {"status": "created"}
     except PageFound:
         request.errors.add('querystring', 'found', 'A page already exists')
 
 
-@article.patch(schema=EditArticleSchema, validators=valid_token)
+@article.patch(schema=EditArticleSchema, validators=(valid_token,
+                                                     colander_body_validator))
 def api_article_update(request):
     """
     Updates an article.
     Accepts: display_name, article, summary, tags
     """
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    user = u.show("admin")
+    user = u.show("admin") # TODO: lookup user
     try:
         page = c.show_page(page_id)
         page.display_name = display_name
         c.update(request, page, article, summary, user, tags)
-        return {"info": "updated"}
+        return {"status": "updated"}
     except PageNotFound:
         request.errors.add('querystring', 'not_found', 'Page not found')
 
@@ -99,7 +90,7 @@ def api_article_delete(request):
     page_id = request.matchdict.get('page_id')
     try:
         c.delete(request, c.show_page(page_id))
-        return {"info": "deleted"}
+        return {"status": "deleted"}
     except PageNotFound:
         request.errors.add('querystring', 'not_found', 'Page Not Found')
 
