@@ -5,7 +5,7 @@ from cornice import Service
 from cornice.validators import colander_body_validator
 
 from pyracms.lib.userlib import UserLib
-from pyracms.web_service_views import valid_token, valid_permission
+from pyracms.web_service_views import valid_token, valid_permission, APP_JSON
 
 from .deform_schemas.article import EditArticleSchema
 from .lib.articlelib import ArticleLib, PageNotFound, PageFound
@@ -45,8 +45,8 @@ def api_article_read(request):
         request.errors.add('querystring', 'not_found', 'Page Not Found')
 
 
-@article.put(schema=EditArticleSchema, validators=(valid_token,
-                                                   colander_body_validator))
+@article.put(schema=EditArticleSchema, content_type=APP_JSON,
+             validators=(valid_token, colander_body_validator))
 def api_article_create(request):
     """
     Creates an article.
@@ -64,8 +64,8 @@ def api_article_create(request):
         request.errors.add('querystring', 'found', 'A page already exists')
 
 
-@article.patch(schema=EditArticleSchema, validators=(valid_token,
-                                                     colander_body_validator))
+@article.patch(schema=EditArticleSchema, content_type=APP_JSON,
+               validators=(valid_token, colander_body_validator))
 def api_article_update(request):
     """
     Updates an article.
