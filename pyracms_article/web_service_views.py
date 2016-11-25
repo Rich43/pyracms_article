@@ -55,7 +55,7 @@ def api_article_create(request):
     # TODO: Create a BBThread
     # TODO: Create a Gallery
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    user = u.show("admin") # TODO: lookup user
+    user = request.validated['user_db']
     try:
         c.create(request, page_id, display_name, article, summary,
                  user, tags)
@@ -72,7 +72,7 @@ def api_article_update(request):
     Accepts: display_name, article, summary, tags
     """
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    user = u.show("admin") # TODO: lookup user
+    user = request.validated['user_db']
     try:
         page = c.show_page(page_id)
         page.display_name = display_name
