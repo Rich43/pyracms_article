@@ -42,8 +42,12 @@ def api_article_read(request):
             revision = c.show_revision(page, revision_id)
         else:
             revision = page.revisions[0]
+        if not revision:
+            request.errors.add('querystring', 'not_found', 'Revision not found')
+            return
         if page.private:
             request.errors.add('body', 'private', 'This page is private')
+            return
         else:
             revision_list = []
             for rev in page.revisions:
