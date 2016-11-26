@@ -35,7 +35,7 @@ def check_owner(request, page_id):
 def api_article_read(request):
     """Gets an article from the database."""
     page_id = request.matchdict.get('page_id') or "Front_Page"
-    revision_id = request.matchdict.get('revision')
+    revision_id = request.params.get('revision')
     try:
         page = c.show_page(page_id)
         if revision_id:
@@ -47,8 +47,7 @@ def api_article_read(request):
         else:
             revision_list = []
             for rev in page.revisions:
-                revision_list.append({"display_name": rev.display_name,
-                                      "summary": rev.summary,
+                revision_list.append({"summary": rev.summary,
                                       "revision_id": rev.id,
                                       "user": rev.user.name,
                                       "created": str(rev.created)})
