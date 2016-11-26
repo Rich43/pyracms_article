@@ -1,6 +1,3 @@
-"""
-TODO: Beef up security, check permissions
-"""
 from cornice import Service
 from cornice.validators import colander_body_validator
 
@@ -24,6 +21,15 @@ def quick_get_matchdict(request):
     tags = request.json_body.get('tags') or ""
     return page_id, display_name, article, summary, tags
 
+
+def check_owner(request, page_id):
+    page = c.show_page(page_id)
+    if (valid_permission(request, 'article_mod') or
+        page.user == request.validated['user_db']):
+        return True
+    else:
+        request.errors.add('body', 'access_denied', 'Access denied')
+    return False
 
 @article.get()
 def api_article_read(request):
@@ -54,6 +60,9 @@ def api_article_create(request):
     """
     # TODO: Create a BBThread
     # TODO: Create a Gallery
+    if not valid_permission(request, "article_create"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
     user = request.validated['user_db']
     try:
@@ -71,7 +80,11 @@ def api_article_update(request):
     Updates an article.
     Accepts: display_name, article, summary, tags
     """
+    if not valid_permission(request, "article_update"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
+    check_owner(request, page_id)
     user = request.validated['user_db']
     try:
         page = c.show_page(page_id)
@@ -88,6 +101,7 @@ def api_article_delete(request):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
     page_id = request.matchdict.get('page_id')
+    check_owner(request, page_id)
     try:
         c.delete(request, c.show_page(page_id))
         return {"status": "deleted"}
