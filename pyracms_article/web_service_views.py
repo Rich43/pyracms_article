@@ -58,8 +58,6 @@ def api_article_create(request):
     Creates an article.
     Accepts: display_name, article, summary, tags
     """
-    # TODO: Create a BBThread
-    # TODO: Create a Gallery
     if not valid_permission(request, "article_create"):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
