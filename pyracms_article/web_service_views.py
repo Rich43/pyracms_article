@@ -84,7 +84,8 @@ def api_article_update(request):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
     page_id, display_name, article, summary, tags = quick_get_matchdict(request)
-    check_owner(request, page_id)
+    if not check_owner(request, page_id):
+        return
     user = request.validated['user_db']
     try:
         page = c.show_page(page_id)
@@ -101,7 +102,8 @@ def api_article_delete(request):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
     page_id = request.matchdict.get('page_id')
-    check_owner(request, page_id)
+    if not check_owner(request, page_id):
+        return
     try:
         c.delete(request, c.show_page(page_id))
         return {"status": "deleted"}
