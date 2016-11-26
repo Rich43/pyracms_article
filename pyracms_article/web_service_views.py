@@ -45,8 +45,15 @@ def api_article_read(request):
         if page.private:
             request.errors.add('body', 'private', 'This page is private')
         else:
-            # TODO: Iterate revisions and list them
-            return {'page': page.to_dict(), 'revision': revision.to_dict()}
+            revision_list = []
+            for rev in page.revisions:
+                revision_list.append({"display_name": rev.display_name,
+                                      "summary": rev.summary,
+                                      "revision_id": rev.id,
+                                      "user": rev.user.name,
+                                      "created": str(rev.created)})
+            return {'page': page.to_dict(), 'revision': revision.to_dict(),
+                    'revision_list': revision_list}
     except PageNotFound:
         request.errors.add('querystring', 'not_found', 'Page Not Found')
 
