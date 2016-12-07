@@ -1,6 +1,6 @@
 from cornice import Service
 from cornice.validators import colander_body_validator
-
+from pyracms import WidgetLib
 from pyracms.lib.userlib import UserLib
 from pyracms.web_service_views import valid_token, valid_permission, APP_JSON
 
@@ -11,7 +11,7 @@ article = Service(name='api_article', path='/api/article/item/{page_id}',
                   description="Create, read, update, delete articles")
 c = ArticleLib()
 u = UserLib()
-
+w = WidgetLib()
 
 def quick_get_matchdict(request):
     page_id = request.matchdict.get('page_id') or "Front_Page"
@@ -55,7 +55,10 @@ def api_article_read(request):
                                       "revision_id": rev.id,
                                       "user": rev.user.name,
                                       "created": str(rev.created)})
-            return {'page': page.to_dict(), 'revision': revision.to_dict(),
+            revision_dict = revision.to_dict()
+            revision_dict["rendered"] = w.render_article(page.renderer.name,
+                                                         revision.article)
+            return {'page': page.to_dict(), 'revision': revision_dict,
                     'revision_list': revision_list}
     except PageNotFound:
         request.errors.add('querystring', 'not_found', 'Page Not Found')
