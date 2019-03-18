@@ -1,7 +1,5 @@
 FROM python:latest
 
-EXPOSE 6543/tcp
-
 # We copy this file first to leverage docker cache
 COPY ./requirements.txt /app/requirements.txt
 
